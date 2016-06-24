@@ -9,7 +9,7 @@ XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'
 class DIF(object):
     """This is the GCMD DIF format
 
-    It is registered as prefix 'moai_dif'.'
+    It is registered as prefix 'dif'.'
     """
 
     def __init__(self, prefix, config, db):
@@ -18,27 +18,27 @@ class DIF(object):
         self.db = db
 
         self.ns = {
-                   None : 'http://gcmd.gsfc.nasa.gov/Aboutus/xml/moai_dif/'
+                   None : 'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'
         }
 
         # TODO: Mofidy this hard coded schema
         # to follow whatever the input schema say
         # BUT: make sure it is some DIF version
         self.schemas = {
-           None: 'http://gcmd.nasa.gov/Aboutus/xml/moai_dif/dif_v9.8.4.xsd'
+           None: 'http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd'
         }
 
     def get_namespace(self):
-        return self.ns[self.prefix]
+        return self.ns[None]
 
     def get_schema_location(self):
-        return self.schemas[self.prefix]
+        return self.schemas[None]
 
     def __call__(self, element, metadata):
         data = metadata.record
         DIF = ElementMaker(namespace=self.ns[None], nsmap=self.ns)
         dif = DIF.dif()
-        create_xml(data['metadata']['moai_dif'], dif, DIF)
+        create_xml(data['metadata']['dif'], dif, DIF)
         dif.attrib['{%s}schemaLocation' % XSI_NS] = '%s %s' % (
                         self.ns[None],
                         self.schemas[None])

@@ -14,17 +14,16 @@ class XMLContent(object):
         self.metadata = None
 
     def update(self, path):
-        ## We validate that the  input file follows moai_dif 9.8.4
+        ## We validate that the  input file follows dif 9.8.4
         # TODO: validate that it follows whatever schema/version its said to follow
         doc = etree.parse(path, parser=get_parser())
-        xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/moai_dif/'})
+        xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
         self.root = doc.getroot()
-
         id = xpath.string('//x:Entry_ID')
         self.id = id
         self.modified = xpath.date('//x:Last_DIF_Revision_Date')
         self.metadata = {}
-        self.metadata['moai_dif'] = extract_node(self.root)
+        self.metadata['dif'] = extract_node(self.root)
 
 
 def extract_node(node):
@@ -49,7 +48,7 @@ def extract_node(node):
 
 
 def get_parser():
-    xsdPath = os.path.dirname(os.path.abspath(__file__)) + '/dif_v9.8.4.xsd'
+    xsdPath = os.path.dirname(os.path.abspath(__file__)) + '/../dif_v9.8.4.xsd'
     with open(xsdPath, "r") as myfile:
         schemaString = myfile.read()
     schema_root = etree.XML(schemaString)
