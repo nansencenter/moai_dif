@@ -1,6 +1,7 @@
 import re
 import uuid
 import sys
+import lxml.etree
 
 from lxml.builder import ElementMaker
 
@@ -18,38 +19,27 @@ class DIF(object):
         self.db = db
 
         self.ns = {
-                   None : 'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'
+                   'dif' : 'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'
         }
 
         # TODO: Mofidy this hard coded schema
         # to follow whatever the input schema say
         # BUT: make sure it is some DIF version
         self.schemas = {
-           None: 'http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd'
+           'dif' : 'http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd'
         }
 
     def get_namespace(self):
-        return self.ns[None]
+        return self.ns[self.prefix]
 
     def get_schema_location(self):
-        return self.schemas[None]
-
+        return self.schemas[self.prefix]
+    
     def __call__(self, element, metadata):
-        data = metadata.record
-        DIF = ElementMaker(namespace=self.ns[None], nsmap=self.ns)
-        dif = DIF.dif()
-        create_xml(data['metadata']['dif'], dif, DIF)
-        dif.attrib['{%s}schemaLocation' % XSI_NS] = '%s %s' % (
-                        self.ns[None],
-                        self.schemas[None])
-        element.append(dif)
+        element.append(document(metadata))
 
-
-def create_xml(inElement, root, em):
-    for tag, val in inElement:
-        if isinstance(val, list):
-            element = []
-            create_xml(val, element, em)
-            root.append(em(tag, *element))
-        else:
-            root.append(em(tag, val))
+def document(metadata):
+    data = metadata.record
+    record = metadata.record['metadata']['dif']
+    record = record.encode('utf8')
+    return lxml.etree.XML(record)

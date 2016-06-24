@@ -1,5 +1,6 @@
 from lxml import etree
 import os
+import datetime
 
 from moai.utils import XPath
 
@@ -14,37 +15,17 @@ class XMLContent(object):
         self.metadata = None
 
     def update(self, path):
-        ## We validate that the  input file follows dif 9.8.4
+        # # We validate that the  input file follows dif 9.8.4
         # TODO: validate that it follows whatever schema/version its said to follow
         doc = etree.parse(path, parser=get_parser())
         xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
         self.root = doc.getroot()
         id = xpath.string('//x:Entry_ID')
         self.id = id
-        self.modified = xpath.date('//x:Last_DIF_Revision_Date')
-        self.metadata = {}
-        self.metadata['dif'] = extract_node(self.root)
-
-
-def extract_node(node):
-    element = []
-    if (len(node.getchildren()) == 0):
-       if node.text:
-           val = (node.tag.split("}")[1], node.text)
-           element.append(val)
-    else:
-        for node2 in node:
-            tag = node2.tag.split("}")[1]
-            val = None
-            if (len(node2.getchildren()) == 0):
-                if node2.text:
-                    val = node2.text
-            else:
-                val = extract_node(node2)
-            if (val):
-                val = (tag, val)
-                element.append(val)
-    return element
+        self.modified = datetime.datetime.now()
+#         self.modified = xpath.date('//x:Last_DIF_Revision_Date')
+        document_text = open(path).read()
+        self.metadata = { 'dif' : document_text }
 
 
 def get_parser():
