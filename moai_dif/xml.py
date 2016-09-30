@@ -14,18 +14,32 @@ class XMLContent(object):
                                                    u'description':u'NORMAP data'}}
         self.metadata = None
 
-    def update(self, path):
+    def update(self, data):
+        self.id = unicode(data['id'][:-3])
+        svninfo = data['svn']
+        self.modified = svninfo.date
+        self.deleted = svninfo.deleted
+        document = svninfo.get() #urllib.urlopen(svninfo.path)
+        root = etree.fromstring(document)
+        xpath = XPath(root, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
+        if not self.deleted:
+            self.modified = parsed_time = xpath.date('//x:Last_DIF_Revision_Date')
+            #if parsed_time:
+            #    self.modified = util.parse_time(parsed_time[0].text)
+        #self.sets = self._get_sets(root)
+        self.metadata = {'dif': etree.tostring(root)}
         # # We validate that the  input file follows dif 9.8.4
         # TODO: validate that it follows whatever schema/version its said to follow
-        doc = etree.parse(path, parser=get_parser())
-        xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
-        self.root = doc.getroot()
-        id = xpath.string('//x:Entry_ID')
-        self.id = id
-        self.modified = datetime.datetime.now()
+        #doc = etree.parse(path, parser=get_parser())
+        #xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
+        #xpath = XPath(doc, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
+        #self.root = doc.getroot()
+        #id = xpath.string('//x:Entry_ID')
+        #self.id = id
+        #self.modified = datetime.datetime.now()
 #         self.modified = xpath.date('//x:Last_DIF_Revision_Date')
-        document_text = open(path).read()
-        self.metadata = { 'dif' : document_text }
+        #document_text = open(path).read()
+        #self.metadata = { 'dif' : document_text }
 
 
 def get_parser():
