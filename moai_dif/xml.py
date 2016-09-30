@@ -15,7 +15,7 @@ class XMLContent(object):
         self.metadata = None
 
     def update(self, data):
-        self.id = unicode(data['id'][:-3])
+        self.id = unicode(data['id'][:-4])
         svninfo = data['svn']
         self.modified = svninfo.date
         self.deleted = svninfo.deleted
