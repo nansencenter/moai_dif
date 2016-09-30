@@ -23,7 +23,8 @@ class XMLContent(object):
         root = etree.fromstring(document)
         xpath = XPath(root, nsmap={'x':'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/'})
         if not self.deleted:
-            self.modified = parsed_time = xpath.date('//x:Last_DIF_Revision_Date')
+            self.modified = datetime.datetime.now()
+            #self.modified = parsed_time = xpath.date('//x:Last_DIF_Revision_Date')
             #if parsed_time:
             #    self.modified = util.parse_time(parsed_time[0].text)
         #self.sets = self._get_sets(root)
